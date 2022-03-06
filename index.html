@@ -4,49 +4,43 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>c4k.together</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
+    <style>
+      div.t4left {
+        width: 30%;
+        float: left;
+        box-sizing: border-box;
+      }
+      div.t4right {
+        width: 70%;
+        height: 800px;
+        float: right;
+        box-sizing: border-box;
+      }
+    </style>
 </head>
 <body>
-<div id="info_area">
-  <div id="map_group" style="background-color: orange; width:70%; float:left; height:500px">
-	  <div id="map" style="width:100%;height:90%; background-color: gray;"></div>
-    <div id="mapInfo"></div>
-  </div>
-  <div id="detail" style="background-color: aqua; width:30%; float:left; height:500px">
-    <h4>설치 위치 정보</h4>
-    <div class="mb-3" style="width: 80%; margin-left: 30px;">
-      <div class="mb-3">
-        <label for="InputAddress" class="form-label">주소</label>
-        <input type="text" class="form-control" id="address1" aria-describedby="Address Help">
-        <div id="AddressHelp" class="form-text">경사로 위치</div>
-      </div>
-      <div class="mb-3">
-        <select class="form-select" id="state">
-          <option value="-1" selected>상태를 선택 해 주세요.</option>
-          <option value="0">신청</option>
-          <option value="1">완료</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="formFile" class="form-label">설치요청위치</label>
-        <input class="form-control" type="file" id="formFileBefore">
-      </div>
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="option1">
-        <label class="form-check-label" for="forOption1">Option</label>
-      </div>
-      <button class="btn btn-primary" id="update">등록/갱신</button>
-    </div>
-  </div>
-</div>
-  <br><br>
 
-  <div id="list" style="float:top">
+  <nav class="navbar navbar-expand-lg" style="background-color: #490841;">
+    <a class="navbar-brand" href="http://codefor.kr" target="new">Code for Korea</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="#">Features</a>
+        <a class="nav-item nav-link" href="#">Pricing</a>
+        <a class="nav-item nav-link disabled" href="#">Disabled</a>
+      </div>
+    </div>
+  </nav>
+<div id="info_area">
+  <div id="list" class="t4left">
     <h4>설치 위치 목록</h4>
-    <table class="table" style="width:90%; margin: auto;">
+    <table class="table">
       <thead>
         <tr>
           <th scope="col">주소</th>
@@ -57,12 +51,71 @@
       </tbody>
     </table>
   </div>
+  <div id="map_group"  class="t4right" style="background-color: orange;">
+	  <div id="map" style="width:100%;height:90%; background-color: gray;"></div>
+    <div id="mapInfo"></div>
+  </div>
+</div>
+
     <br><br><br>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=07d2c3a356d8de5c9e3b858db0aded78&libraries=services,clusterer,drawing"></script>
-    <script>
-      var container = document.getElementById('map');
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
+        import { collection, addDoc, getFirestore, getDocs  } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js";
+        import { getStorage   } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-storage.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDGPUHbbaAwk5Sug_NEO7x3b4sCDGbeRxE",
+          authDomain: "together-map.firebaseapp.com",
+          projectId: "together-map",
+          storageBucket: "together-map.appspot.com",
+          messagingSenderId: "237459537822",
+          appId: "1:237459537822:web:6ecbacf2d232896256608f"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore();
+        const storage = getStorage(app);
+
+        var all_pois = [];
+
+        // 마커 이미지의 이미지 주소입니다
+        var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png"; 
+        // 마커 이미지의 이미지 크기 입니다
+        var imageSize = new kakao.maps.Size(24, 35); 
+
+        // DB 읽기
+        const querySnapshot = await getDocs(collection(db, "POIr"));
+        querySnapshot.forEach((doc) => {
+          const poi = doc.data();
+          const title = poi.title;
+          const address = poi.address;
+          let state = '신청';
+          if (poi.state === 1)
+            state = '완료'
+            $("#list_body").append(`<tr><td>${address}</td><td>${state}</td></tr>`);
+            
+            var item = {
+              title : title,
+              address : address,
+              state : state
+            }
+            all_pois.push(item);
+            
+        });
+
+
+        var container = document.getElementById('map');
       var options = {
-        center: new kakao.maps.LatLng(35.68440141850241, 127.64369033659264),
+        center: new kakao.maps.LatLng(37.53005936200752, 126.85655618649268),
         level: 6
       };
   
@@ -99,85 +152,58 @@
               var level = map.getLevel();
               var message = '중심좌표(위도,경도) = [ ' + center.getLat() + ', ' + center.getLng() + ' ]<br>';
               message += '주소 = ' + address;
-              
               mapInfo.innerHTML = message;
           }      
           
           //geocoding callback
           function getAddress(result, status) {
               var address = '';
-  
               if (status === kakao.maps.services.Status.OK) {
                   for(var i = 0; i < result.length; i++) {
                       // 행정동의 region_type 값은 'H' 이므로
                       address += result[i].address.address_name;
                   }
               }   
-              
               showMapInfo(address);
-  
-  
-          }
-  
-    </script>  
+          }        
 
+        all_pois.forEach(function(item, index) {
+            geocoder.addressSearch(item.address, function(result, status) {
+                if (status === daum.maps.services.Status.OK) {
+                    var coords = new daum.maps.LatLng(result[0].y, result[0].x);
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+                    console.log(coords);
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+                    // 마커를 생성합니다
 
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
-        import { collection, addDoc, getFirestore, getDocs  } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js";
-        import { getStorage   } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-storage.js";
+                    var marker = new kakao.maps.Marker({
+                        map: map, // 마커를 표시할 지도
+                        position: coords
+                    });
 
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
-      
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyDGPUHbbaAwk5Sug_NEO7x3b4sCDGbeRxE",
-          authDomain: "together-map.firebaseapp.com",
-          projectId: "together-map",
-          storageBucket: "together-map.appspot.com",
-          messagingSenderId: "237459537822",
-          appId: "1:237459537822:web:6ecbacf2d232896256608f"
-        };
-      
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore();
-        const storage = getStorage(app);
+                    marker.setMap(map);
 
-        // DB 읽기
-        const querySnapshot = await getDocs(collection(db, "POI"));
-        querySnapshot.forEach((doc) => {
-          const poi = doc.data();
-          const address = poi.address;
-          let state = '신청';
-          if (poi.state === 1)
-            state = '완료'
-            $("#list_body").append(`<tr><td>${address}</td><td>${state}</td></tr>`)      
+                    var iwContent = `<div style="padding:5px;">${all_pois[index].title}</div>`, // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+                        iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+
+                    // 인포윈도우를 생성합니다
+                    var infowindow = new kakao.maps.InfoWindow({
+                        content : iwContent,
+                        removable : iwRemoveable
+                    });
+
+                    // 마커에 클릭이벤트를 등록합니다
+                    kakao.maps.event.addListener(marker, 'click', function() {
+                          // 마커 위에 인포윈도우를 표시합니다
+                          infowindow.open(map, marker);  
+                    });                    
+
+                } 
+            });
         });
 
-        // 추가
-        $('#update').click(async function(){
-          try {
-            const poi = {
-              address: $('#address1').val(),
-              state: $('#state').val()
-            }
-            const docRef = await addDoc(collection(db, "POI"), poi);
-            console.log("Document written with ID: ", docRef.id);
-            window.location.href = "/index.html"
-          } catch (e) {
-            console.error("Error adding document: ", e);
-          }
-          
-        })
-
-
+      
+           
 
       </script>
 </body>
