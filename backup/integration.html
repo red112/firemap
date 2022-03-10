@@ -676,7 +676,7 @@ const pois = [
                         lat : lat,
                         lon : lon
                     }
-                    const docRef = addDoc(collection(db, "POIx"), new_poi);
+                    const docRef = addDoc(collection(db, "ramp_yangcheon"), new_poi);
                     console.log(`POI[${title}] written with ID ${docRef.id}`);
                 } catch (e) {
                     console.error("Error adding document: ", e);
