@@ -93,11 +93,13 @@
         var imageSize = new kakao.maps.Size(24, 35); 
 
         // DB 읽기
-        const querySnapshot = await getDocs(collection(db, "POIr"));
+        const querySnapshot = await getDocs(collection(db, "POIx"));
         querySnapshot.forEach((doc) => {
           const poi = doc.data();
           const title = poi.title;
           const address = poi.address;
+          const lat = poi.lat;
+          const lon = poi.lon;
           let state = '신청';
           if (poi.state === 1)
             state = '완료'
@@ -106,7 +108,9 @@
             var item = {
               title : title,
               address : address,
-              state : state
+              state : state,
+              lat : lat,
+              lon : lon
             }
             all_pois.push(item);
             
@@ -167,43 +171,31 @@
               showMapInfo(address);
           }        
 
-        all_pois.forEach(function(item, index) {
-            geocoder.addressSearch(item.address, function(result, status) {
-                if (status === daum.maps.services.Status.OK) {
-                    var coords = new daum.maps.LatLng(result[0].y, result[0].x);
+        all_pois.forEach((poi) => {
+          var coords = new daum.maps.LatLng(poi.lat, poi.lon);
+          var marker = new kakao.maps.Marker({
+              map: map, // 마커를 표시할 지도
+              position: coords
+          });  
+          marker.setMap(map);
 
-                    console.log(coords);
+          var iwContent = `<div style="padding:5px;">${poi.title}</div>`, // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+          iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
 
-                    // 마커를 생성합니다
+          // 인포윈도우를 생성합니다
+          var infowindow = new kakao.maps.InfoWindow({
+              content : iwContent,
+              removable : iwRemoveable
+          });
 
-                    var marker = new kakao.maps.Marker({
-                        map: map, // 마커를 표시할 지도
-                        position: coords
-                    });
+          // 마커에 클릭이벤트를 등록합니다
+          kakao.maps.event.addListener(marker, 'click', function() {
+                // 마커 위에 인포윈도우를 표시합니다
+                infowindow.open(map, marker);  
+          });    
 
-                    marker.setMap(map);
 
-                    var iwContent = `<div style="padding:5px;">${all_pois[index].title}</div>`, // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
-                        iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
-
-                    // 인포윈도우를 생성합니다
-                    var infowindow = new kakao.maps.InfoWindow({
-                        content : iwContent,
-                        removable : iwRemoveable
-                    });
-
-                    // 마커에 클릭이벤트를 등록합니다
-                    kakao.maps.event.addListener(marker, 'click', function() {
-                          // 마커 위에 인포윈도우를 표시합니다
-                          infowindow.open(map, marker);  
-                    });                    
-
-                } 
-            });
         });
-
-      
-           
 
       </script>
 </body>
